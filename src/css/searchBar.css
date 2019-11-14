@@ -1,0 +1,18 @@
+.search-bar{
+    /*margin: 0 auto;*/
+    width:13em;
+}
+.search-bar input{
+    border-radius: 2px;
+    border: 0;
+    height: 3em;
+    outline: none;
+}
+.search-bar input:first-child{
+    width: 10em;
+}
+.search-bar input:last-child{
+    background-color: #be2a77;
+    color:white;
+    width: 5em;
+}

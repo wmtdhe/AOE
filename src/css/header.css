@@ -1,0 +1,27 @@
+/*Header setting*/
+.header{
+    left: 0;
+    right: 0;
+    height: 5em;
+    max-width: 100vw;
+    width:100%;
+    background-color: olive;
+    /*opacity: 0.5;*/
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.header ul{
+
+}
+.header ul li{
+    list-style: none;
+
+}
+
+.log-section a{
+    text-decoration: none;
+    color: black;
+}
