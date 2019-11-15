@@ -1,7 +1,5 @@
 import React from 'react';
-import logo from './logo.svg';
 import './css/recipe.css';
-import SearchBar from "./comps/searchBar";
 import Header from './comps/Header';
 import './css/background.css';
 
@@ -33,9 +31,6 @@ function Nutrient(props){
     </ul>)
 }
 
-function Comments(props) {
-
-}
 
 class Recipe extends React.Component{
     constructor(props){
@@ -47,8 +42,13 @@ class Recipe extends React.Component{
             intro:'',
             steps:[],
             ingredients:[],
-            nutrients:[]
+            nutrients:[],
+            comments:[],
+            count:7,
+            current_page:0,
         }
+        this.renderPageBox=this.renderPageBox.bind(this)
+        this.handlePage=this.handlePage.bind(this)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -60,7 +60,9 @@ class Recipe extends React.Component{
     componentDidMount() {
         // console.log('aa-------',this.props.location);
         // this.getQuery();
-        this.callBackendAPI()
+        let search = this.props.location.search;
+        let url = 'http://localhost:5000/recipe'+search
+        this.callBackendAPI(url)
             .then(res => {
                 this.setState({ data: res });
                 // console.log('im data',this.state.data)
@@ -76,21 +78,26 @@ class Recipe extends React.Component{
                     intro:this.state.data.description,
                     name: this.state.data.name,
                     id:this.state.data.id,
-                    nutrients:nutrientList
+                    nutrients:nutrientList,
+                    count:this.state.data.count,
+                    current_page:this.state.data.count>0?1:0
                 }
                 );
                 //React-helmet
                 document.title = this.state.name;
+                //initial comments
+                let commentUrl = `http://localhost:5000/recipe/comments?page=1&cid=${this.state.id}`
+                this.callBackendAPI(commentUrl).then(res=>this.setState({comments:res})).catch(err=>console.log(err))
             })
             .catch(err => console.log(err,' my fault'));
 
 
     }
 
-    async callBackendAPI(){
-        let search = this.props.location.search;
-        console.log('--------here')
-        const response = await fetch('http://localhost:5000/recipe'+search);
+    async callBackendAPI(url){
+
+        // console.log('--------here')
+        const response = await fetch(url);
         const body = await response.json();
 
         if (response.status !== 200) {
@@ -109,6 +116,38 @@ class Recipe extends React.Component{
             return(obj);
         });
         console.log(queries);
+    };
+    //-----page navigation box
+    renderPageBox(){
+        let pages=Math.ceil(this.state.count/5)
+        let temp=pages?new Array(pages).fill(0):[]
+        return(
+            <div className='comment-nav'>
+                <div onClick={(e)=>this.handlePage(e,this.state.current_page-1)}>Prev</div>
+                <ul>
+                    {
+                        temp.map((v,index)=><li key={index+1} className={this.state.current_page==(index+1)?('active'):('')} onClick={(e)=>(this.handlePage(e,index+1))}>
+                            {index+1}
+                        </li>)
+                    }
+                </ul>
+                <div onClick={(e)=>this.handlePage(e,this.state.current_page+1)}>Next</div>
+            </div>
+        )
+    }
+    handlePage(e,page){
+        let pages=Math.ceil(this.state.count/5)
+        if(page==0 || page==(pages+1)){return;}
+        this.setState({current_page:page})
+        let url =`http://localhost:5000/recipe/comments?page=${page}&cid=${this.state.id}`
+        this.callBackendAPI(url)
+            .then(res=>{
+                console.log(res)
+                this.setState({
+                    comments:res
+                })
+            })
+            .catch(err=>console.log(err))
     }
 
     /**
@@ -146,10 +185,31 @@ class Recipe extends React.Component{
                         </div>
                         <div className='side-menu'>side menu</div>
                     </div>
+                    <div className='comment-section'>
+                        <h1>Comments</h1>
+                        <Comments comments={this.state.comments}/>
+                        {this.renderPageBox()}
+                    </div>
                 </div>
+
             </div>
         )
     }
 }
 
+function Comments(props) {
+    let comments = props.comments
+    return(
+        <div className='comments'>
+            <ul>
+                {
+                    comments.map((comment,index)=><li key={index}>
+                        {comment.content}
+                    </li>)
+                }
+            </ul>
+        </div>
+    )
+}
+//<Route path={`/recipe/comments`} component={this.renderComments()}/>
 export default Recipe;

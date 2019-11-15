@@ -33,10 +33,21 @@ router.route('/').get((req,res)=>{
             if(err) throw err;
             //use the connect
             let query = `SELECT * FROM recipes r, nutrition n WHERE r.id=${recipe} AND r.id=n.id`
-            connection.query(query,function (err,row,fields) {
+            connection.query(query,function (err,row1,fields) {
                 if(err) {throw err;}
                 // console.log('i got here too')
-                res.send(row[0])
+                let subquery = `select count(c.id) as count from recipes r, comments c where c.belong_to_r=r.id and r.id=${recipe}`
+                connection.query(subquery,function (err,row,fields) {
+                    if(err) {throw err}
+                    if(row1[0]){
+                        row1[0].count=row[0].count
+                        res.send(row1[0])
+                    }
+                    else{
+                        res.send(row1[0])
+                    }
+                })
+
                 //when done with the connection, release it
                 connection.release();
             })
@@ -51,6 +62,21 @@ router.route('/').get((req,res)=>{
     }
 )
 
+router.get('/comments',function (req,res) {
+    console.log(req.query)
+    let page=req.query.page
+    let cid=req.query.cid
+    pool.getConnection(function (err,connection) {
+        if(err){throw err}
+        let query = `select * from comments where belong_to_r=${cid} and id between ${page-1}*5+1 and ${page}*5`
+        connection.query(query,function (err,row,fields) {
+            if(err){throw err}
+            res.send(row)
+        })
+        connection.release()
+    })
+
+})
 
 //export router
 module.exports = router;

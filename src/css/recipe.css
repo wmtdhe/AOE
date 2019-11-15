@@ -118,3 +118,43 @@
 .ingredient li:nth-of-type(even){
     background-color: #9ecaed;
 }
+
+/*comment section*/
+.comment-section {
+    border: 1px black dashed;
+    width: 100%;
+    position: relative;
+}
+.comment-section h1{
+    width: 100%;
+    height: max-content;
+    text-align: center;
+}
+.comment-nav{
+    position: absolute;
+    right:1em;
+    top:1em;
+}
+.comment-nav div, .comment-nav ul{
+    float: left;
+}
+.comment-nav li{
+    list-style: none;
+    float: left;
+    margin: 0 0.5em 0 0.5em;
+    font-size: 17px;
+}
+.active{
+    color: #09d3ac;
+}
+.comment-nav li:hover, .comment-nav div:hover{
+    cursor: pointer;
+    color: #9ecaed;
+}
+
+.comments ul li{
+    list-style: none;
+    height: 5em;
+    border-bottom: 1px black solid;
+    margin: 1em 1em 0 1em;
+}

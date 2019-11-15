@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
-import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import {BrowserRouter as Router, Route, Switch, Link} from "react-router-dom";
 import Recipe from "./recipe";
 import Home from "./home";
 import Contact from "./contact";
@@ -34,7 +34,8 @@ class App extends Component{
         <Router>
                 <Switch>
                     <Route path='/' component={Home} exact/>
-                    <Route path='/recipe' component={Recipe} exact/>
+                    <Route path='/recipe' component={Recipe}>
+                    </Route>
                     <Route path='/contact' component={Contact} />
                     <Route path='/search' component={Search} exact/>
                     <Route path='/user/signup' component={SignUp} exact>
